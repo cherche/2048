@@ -53,7 +53,13 @@ export default function Array2 ({
   }
 
   arr2.every2 = (callback) => {
-    return arr2.every(row => row.every(callback))
+    for (let x = 0; x < width; x++) {
+      for (let y = 0; y < height; y++) {
+        if (!callback(arr2, [i, j])) return false
+      }
+    }
+
+    return true
   }
 
   return arr2

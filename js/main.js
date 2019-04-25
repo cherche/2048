@@ -1,22 +1,10 @@
 import Array2 from './array2.js'
+import { getRandomInt, getRandomVal } from './probability.js'
 
-const WIDTH = 5
+const WIDTH = 4
 const HEIGHT = 4
 
 const map = Array2({ fill: 0, size: [WIDTH, HEIGHT] })
-
-map.set([0, 0], 2)
-map.set([1, 0], 4)
-map.set([2, 0], 2)
-map.set([3, 0], 2)
-
-map.set([1, 1], 2)
-map.set([2, 1], 2)
-
-map.set([0, 2], 2)
-map.set([1, 2], 2)
-map.set([2, 2], 8)
-map.set([3, 2], 8)
 
 // This stuff just deals with order of iteration
 // Sometimes we want to move horizontally (fix the y-axis)
@@ -30,7 +18,10 @@ const orient = function orient ([i, j], axis) {
   return orientations[axis]
 }
 
+// I will need to add some sort of check to see if
+// there are any valid moves
 const move = function move (axis, opp = false) {
+  // For brevity, we'll define a local orient function
   const lOrient = function lOrient (vals) {
     return orient(vals, axis)
   }
@@ -135,6 +126,20 @@ const moveLeft = function moveLeft () {
 }
 */
 
+const addRandomTile = function addRandomTile () {
+  let done = false
+  const value = getRandomVal([2, 4])
+
+  do {
+    const coords = [getRandomInt(0, WIDTH), getRandomInt(0, HEIGHT)]
+
+    if (map.get(coords) === 0) {
+      map.set(coords, value)
+      done = true
+    }
+  } while (!done)
+}
+
 const getMapString = function getMapString () {
   let string = ''
 
@@ -148,8 +153,28 @@ const getMapString = function getMapString () {
   return string
 }
 
-console.log(getMapString())
+addRandomTile()
+addRandomTile()
+
+// Just a way for the user to play the game for now
 window.f = function (axis, opp) {
   move(axis, opp)
-  console.log(getMapString())
+  // And then add another tile for good fun
+  addRandomTile()
+  // That would normally be a part of move(), but I haven't implemented
+  // some sort of safety check to prevent an infinite loop
+}
+
+const lookup = {
+  u: [1, false],
+  d: [1, true],
+  l: [0, false],
+  r: [0, true]
+}
+// No error handling! >:)
+while (true) {
+  const input = prompt(getMapString() + '\nEnter [u]p, [d]own, [l]eft, or [r]ight:')
+  if (!input) break
+  const [axis, opp] = lookup[input]
+  f(axis, opp)
 }
